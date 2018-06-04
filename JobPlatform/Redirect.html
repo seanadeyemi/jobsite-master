@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    </head>
+<!------ Include the above in your HEAD tag ---------->
+<body style="padding-top: 45px">
+    <div class="container">
+        <div class="row">
+            <div class="well col-md-12">
+                <div id="usrdiv" class="pull-left">Signing in as <span id="username"></span>, Please wait... </div>
+               
+            </div>
+         
+        </div>
+        <div class="row">
+            <div class="col-md-4 col-md-offset-4">
+                <img src="ajax-loader.gif" id="loader" style="display:none" class="text-center"/>
+            </div>
+        </div>
+    </div>
+
+    <!--<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>-->
+    <!--<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>-->
+    <script src="Scripts/jquery-1.11.1.min.js"></script>
+    <script src="Scripts/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(
+            function () {
+
+                $.ajaxSetup({
+                    beforeSend: function () {
+                        $('#loader').show();
+                    },
+                    complete: function () {
+                        $('#loader').hide();
+
+                    }
+                });
+
+
+
+                var uname = localStorage.getItem('userName');
+                if (localStorage.getItem('access_token') == null) {
+                    window.location.href = "login.html";
+                }
+                if (uname != null) {
+                    $('#username').text(uname);
+                  
+
+                }
+
+
+                
+        
+
+                $.ajax({
+                    url: '/api/user/getuseraccess',
+                    method: 'POST',
+                    data: { userName: uname },
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                    },
+                   
+                    error: function (jqXHR) {
+                        if (jqXHR.status == '401') {
+                           
+                            
+                                alert('Your session has expired. Pls login again');
+                            
+                          
+                            //
+                        }
+                        //else {
+                        //    alert(jqXHR.responseText);
+                        //}
+                    },
+                    complete: function (resp) {
+                        if (resp.responseJSON == "admin") {
+                            window.location.href = "AdminView.html";
+                        }
+                        else if (resp.responseJSON == "user") {
+                            window.location.href = "UserPage.html";
+                        }
+                    }
+                });
+
+            }
+        );
+    </script>
+</body>
+</html>

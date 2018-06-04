@@ -1,0 +1,186 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title></title>
+    <!--<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>-->
+    <script src="Scripts/jquery-1.11.1.min.js"></script>
+    <link href="Content/bootstrap.min.css" rel="stylesheet" />
+    <link href="Content/Site.css" rel="stylesheet" />
+</head>
+<body>
+    <div class="navbar">
+
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="jumbotron">
+                    <div class="main-title"> WELCOME TO JOBS PLATFORM
+                    
+                        <img class="img-circle pull-right" style="width:100px; height:100px"  src="Content/Images/avatar_2x.png"/>
+                    </div>
+
+                </div>
+                
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="well">
+                    <div>
+                        <h4 id="usr"></h4>
+                        <input type="button" id="logout" value="Logout" class="btn btn-primary pull-right" />
+                    </div>
+                    
+
+                </div>
+               
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <h4>Highlights</h4>
+                    </div>
+                    <div class="panel-body">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr class="success">
+                                    <th colspan="3">
+                                        Your Profile:
+                                    </th>
+
+
+                                </tr>
+                            </thead>
+                            <tbody id="tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                  
+
+            </div>
+            <div class="col-md-6">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <a href="#" class="pull-right">View All</a>
+                        <h4>Latest Jobs</h4>
+                    </div>
+                    <div class="panel-body">
+                        <div class="clearfix"></div>
+                        <p>Unilever Nigeria: Senior Graphics Designer</p>
+                        <div class="clearfix"></div>
+                        <hr />
+                        <div class="clearfix"></div>
+                        <p>Cyberspace Ltd: Software Developer</p>
+                        <div class="clearfix"></div>
+                        <hr />
+                        <div class="clearfix"></div>
+                        <p>Microsoft: Concept Developer</p>
+                        <div class="clearfix"></div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+   
+    
+
+   
+    <script src="Scripts/jquery-1.11.1.min.js"></script>
+    <script src="Scripts/jquery.blockUI.js"></script>
+    <!--<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>-->
+    <script>
+        //$(document).ajaxStop(
+        //    $.unblockUI
+        //);
+
+        $(document).ready(
+            function () {
+           
+                var uname = localStorage.getItem('userName');
+                if (localStorage.getItem('access_token') == null) {
+                    window.location.href = "login.html";
+                }
+
+
+                //if (uname != null) {
+                //    $('#username').text(username);
+                //    $('#admin').show('fade');
+
+                //}
+
+
+                $('#logout').click(function () {
+
+                    localStorage.removeItem('access_token');
+                    localStorage.removeItem('userName');
+                    window.location.href = "login.html";
+                });
+
+                $.ajaxSetup({
+                    beforeSend: function () {$.blockUI({
+                        css: {
+                            border: 'none',
+                            padding: '15px',
+                            backgroundColor: '#000',
+                            '-webkit-border-radius': '10px',
+                            '-moz-border-radius': '10px',
+                            opacity: .5,
+                            color: '#fff'
+                        }
+                    });
+                    }
+                    ,
+                    complete: $.unblockUI
+                       
+                    
+                });
+
+
+                $.ajax({
+                    url: '/api/user/getuserbyname',
+                    method: 'POST',
+                    data: {userName: uname},
+                    headers: {
+                        'Authorization': 'Bearer ' + localStorage.getItem('access_token')
+                    },
+
+                    success: function (data) {
+                        $('#table').empty();
+
+                        
+
+                        var item = '<tr><td> Name </td><td>' + data.Name + '</td><td><a href="edit.html?id=' + data.Id + '">Edit<a/></td></tr><tr><td> Career </td><td>' + data.Career + '</td><td><a href="edit.html?id=' + data.Id +'">Edit<a/></td></tr><tr><td> State </td><td>' + data.State + '</td><td><a href="edit.html?id='+data.Id+'">Edit<a/></td></tr>';
+                            $('#tbody').html(item);
+
+                            var txt = 'Hi ' + data.Name;
+
+                            $('#usr').text(txt);
+                       
+                    },
+                    error: function (jqXHR) {
+                        if (jqXHR.status == '401') {
+                           
+                            
+                                alert('Your session has expired. Pls login again');
+
+                                window.location.href = "login.html";
+                            //
+                        }
+                        //else {
+                        //    alert(jqXHR.responseText);
+                        //}
+                    }
+                });
+
+              
+
+            }
+        );
+    </script>
+</body>
+</html>
